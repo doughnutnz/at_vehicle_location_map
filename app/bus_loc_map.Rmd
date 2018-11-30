@@ -1,0 +1,111 @@
+---
+title: "Real-Time Bus & Train Locations in Auckland"
+resource_files:
+- .Renviron
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+# library(leaflet)  # now in the API helpers script
+
+# source in the API helpers
+source("at_api.R")
+
+
+# retrieve API key from environment variable
+api_key <- reactive({
+  key <- get_api_key()
+  
+  shiny::validate(
+    need(key != "", "No API key found. Set environment variable 'OCP_APIM_SUBSCRIPTION_KEY' in your .Renviron file.")
+  )
+  
+  key
+})
+
+# retrieve data from API
+d_bus_locations <- reactive({
+  # run this function every few seconds
+  invalidateLater(1000 * 8)
+  
+  # return API response
+  cat("Hitting API...\n")
+  get_bus_locations(api_key())
+})
+
+# retrieve number of buses
+n_buses <- reactive(
+  nrow(d_bus_locations())
+)
+
+# retrieve number of routes
+n_routes <- reactive(
+  d_bus_locations() %>% distinct(route_id) %>% nrow()
+)
+
+# load lookup table for bus routes
+d_bus_routes <- reactive(get_bus_routes(api_key()))
+
+```
+
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### Current Bus & Train locations in Auckland by [Doug Hunt](https://nz.linkedin.com/in/doughunt) of Codoc Software Services Ltd
+
+```{r}
+# render empty map
+output$map <- renderLeaflet({
+  leaflet() %>% 
+    addTiles() %>% 
+    setView(lng = 174.762224, lat = -36.846841, zoom = 12)
+})
+
+# update map whenever new data becomes available
+observe({
+  req(d_bus_locations())
+
+  # join the route data to the dataframe of bus locations
+  d <- d_bus_locations() %>% 
+    left_join(d_bus_routes(), by = "route_id") %>% 
+    mutate(
+      popup = sprintf("<strong>Line %s</strong> <em>(%s)</em><p>%s</p>", route_short_name, agency_id, route_long_name)
+    )
+
+  # update the map
+  # cat(paste("Making icons with",d$bearing,"\n"))
+  busIcons <- make_icon_lst(d$bearing, BASE_ICON_URL)
+  leafletProxy("map", data = d) %>% 
+    clearMarkers() %>% 
+    addMarkers(lng = ~longitude, lat = ~latitude, popup = ~popup, 
+               icon = busIcons)
+})
+
+leafletOutput("map")
+```
+
+
+Column {data-width=150}
+-----------------------------------------------------------------------
+
+### Buses & Trains in service
+
+```{r}
+renderValueBox({
+  valueBox(prettyNum(n_buses(), big.mark = ","), caption = "buses & trains in service", icon = "fa-bus")
+})
+```
+
+### Active Bus & Train routes
+
+```{r}
+renderValueBox({
+  valueBox(prettyNum(n_routes(), big.mark = ","), caption = "bus & train routes served", icon = "fa-map-marked")
+})
+```

@@ -1,0 +1,9 @@
+packrat/lib*/
+packrat/src
+.RData
+.Renviron
+.Rhistory
+.Rproj.user
+app/.Renviron
+data
+app/rsconnect
