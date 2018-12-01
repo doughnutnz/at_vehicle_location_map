@@ -31,7 +31,7 @@ api_key <- reactive({
 # retrieve data from API
 d_bus_locations <- reactive({
   # run this function every few seconds
-  invalidateLater(1000 * 8)
+  invalidateLater(1000 * 12)
   
   # return API response
   cat("Hitting API...\n")

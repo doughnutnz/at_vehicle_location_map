@@ -20,6 +20,8 @@ AT_VEHICLE_LOCATIONS <- "https://api.at.govt.nz/v2/public/realtime/vehiclelocati
 AT_BUS_ROUTES <- "https://api.at.govt.nz/v2/gtfs/routes"
 AT_API_ENV_VAR <- "OCP_APIM_SUBSCRIPTION_KEY"
 BASE_ICON_URL <- "http://www.aeubal.co.nz/"
+ICON_WIDTH = 12
+ICON_HEIGHT = 12
 
 # API key -----------------------------------------------------------------
 
@@ -41,57 +43,31 @@ make_icon_lst <- function(location_bearing, url_base){
       location_bearing < -1      ~ 
         paste(url_base,"alert-octagon.png", sep=""),
       location_bearing < 0      ~ 
-          paste(url_base,"bus-stop.png", sep=""),
+          paste(url_base,"circ_only.png", sep=""),
         location_bearing <= 22.5  ~ 
-          paste(url_base,"arrow-up.png",sep=""), 
+          paste(url_base,"circ_up.png",sep=""), 
         location_bearing <= 67.5  ~ 
-          paste(url_base,"arrow-up-right.png",sep=""),
+          paste(url_base,"circ_up_right.png",sep=""),
         location_bearing <= 112.5 ~ 
-          paste(url_base,"arrow-right.png",sep=""),
+          paste(url_base,"circ_right.png",sep=""),
         location_bearing <= 157.5 ~ 
-          paste(url_base,"arrow-down-right.png",sep=""),
+          paste(url_base,"circ_down_right.png",sep=""),
         location_bearing <= 202.5 ~ 
-          paste(url_base,"arrow-down.png",sep=""),
+          paste(url_base,"circ_down.png",sep=""),
         location_bearing <= 247.5 ~ 
-          paste(url_base,"arrow-down-left.png",sep=""),
+          paste(url_base,"circ_down_left.png",sep=""),
         location_bearing <= 292.5 ~ 
-          paste(url_base,"arrow-left.png",sep=""),
+          paste(url_base,"circ_left.png",sep=""),
         location_bearing <= 337.5 ~ 
-          paste(url_base,"arrow-up-left.png",sep=""),
+          paste(url_base,"circ_up_left.png",sep=""),
         location_bearing <= 360   ~ 
-          paste(url_base,"arrow-up.png",sep=""),
+          paste(url_base,"circ_up.png",sep=""),
         location_bearing > 360   ~ 
           paste(url_base,"alert-octagon.png",sep="")
     ),
-    iconWidth = 24, iconHeight = 24,
-    iconAnchorX = case_when(
-      location_bearing < -1     ~ 11,  # Error
-      location_bearing < 0      ~ 11,  # Stopped
-      location_bearing <= 22.5  ~ 11,  # Up
-      location_bearing <= 67.5  ~ 6,   # Up Right
-      location_bearing <= 112.5 ~ 4,   # Right
-      location_bearing <= 157.5 ~ 6,   # Down Right
-      location_bearing <= 202.5 ~ 11,  # Down
-      location_bearing <= 247.5 ~ 17,  # Down Left
-      location_bearing <= 292.5 ~ 19,  # Left
-      location_bearing <= 337.5 ~ 17,  # Up left
-      location_bearing <= 360   ~ 11,  # Up
-      location_bearing  > 360   ~ 11   # Error
-    ),
-    iconAnchorY = case_when(
-      location_bearing < -1     ~ 22,  # Error
-      location_bearing < 0      ~ 22,  # Stopped
-      location_bearing <= 22.5  ~ 19,  # Up
-      location_bearing <= 67.5  ~ 17,   # Up Right
-      location_bearing <= 112.5 ~ 11,   # Right
-      location_bearing <= 157.5 ~ 6,   # Down Right
-      location_bearing <= 202.5 ~ 4,  # Down
-      location_bearing <= 247.5 ~ 6,  # Down Left
-      location_bearing <= 292.5 ~ 11,  # Left
-      location_bearing <= 337.5 ~ 17,  # Up left
-      location_bearing <= 360   ~ 19,   # Up
-      location_bearing  > 360   ~ 22   # Error
-    )
+    iconWidth = ICON_WIDTH, iconHeight = ICON_HEIGHT,
+    iconAnchorX = ICON_WIDTH / 2,
+    iconAnchorY = ICON_HEIGHT /2
   )
 }
 
